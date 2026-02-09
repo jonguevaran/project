@@ -1,0 +1,49 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Pack {
+  id          String   @id @default(uuid())
+  name        String
+  directoryId Int
+  status      PackStatus   @default(DIRECTORIO)
+  clientEmail String
+  photogEmail String
+  maxPhotos   Int
+  language    String   @default("es")
+  token       String   @unique
+  watermarkText String? // Texto para la marca de agua
+  watermarkOpacity Float? // Opacidad de la marca de agua (0-1)
+  photos      Photo[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdminConfig {
+  id          Int      @id @default(1)
+  email       String
+  password    String // Contraseña hasheada
+}
+
+model Photo {
+  id        String   @id @default(uuid())
+  packId    String
+  filename  String
+  selected  Boolean  @default(false)
+  pack      Pack     @relation(fields: [packId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+enum PackStatus {
+  DIRECTORIO
+  ASIGNADO
+  EN_PROCESO
+  PROCESADO
+  DISPONIBLE
+}
